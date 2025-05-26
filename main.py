@@ -3,6 +3,7 @@ from huggingface_hub import login, from_pretrained_keras
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 import tensorflow as tf
+import uvicorn
 
 # Log in to Hugging Face
 hf_token = os.getenv("HF_TOKEN")
@@ -37,3 +38,8 @@ async def predict(request: Request):
         }
     except Exception as e:
         return {"error": str(e)}
+
+# 👇 Add this to start Uvicorn using the PORT environment variable
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
