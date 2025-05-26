@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+tensorflow
+huggingface_hub
+pydantic
