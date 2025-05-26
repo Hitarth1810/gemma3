@@ -1,3 +1,14 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Loads variables from .env into os.environ
+
+from huggingface_hub import login
+
+hf_token = os.getenv("HF_TOKEN")
+if hf_token:
+    login(token=hf_token)
+
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from huggingface_hub import from_pretrained_keras
@@ -5,7 +16,7 @@ import tensorflow as tf
 
 app = FastAPI()
 
-# Load model from Hugging Face
+
 model_id = "Hitarth28/finetuned-gemma"
 gemma_lm = from_pretrained_keras(model_id)
 
