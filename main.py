@@ -1,24 +1,20 @@
-from dotenv import load_dotenv
 import os
+from huggingface_hub import login, from_pretrained_keras
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+import tensorflow as tf
 
-load_dotenv()  # Loads variables from .env into os.environ
-
-from huggingface_hub import login
-
+# Log in to Hugging Face
 hf_token = os.getenv("HF_TOKEN")
 if hf_token:
     login(token=hf_token)
 
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
-from huggingface_hub import from_pretrained_keras
-import tensorflow as tf
-
-app = FastAPI()
-
-
+# Load the model
 model_id = "Hitarth28/finetuned-gemma"
 gemma_lm = from_pretrained_keras(model_id)
+
+# Set up FastAPI
+app = FastAPI()
 
 class PromptRequest(BaseModel):
     prompt: str
@@ -31,18 +27,13 @@ async def predict(request: Request):
         if not prompt:
             return {"error": "Prompt is empty."}
 
-        # Generate from model
         result = gemma_lm.generate({"prompts": [prompt]})
         full_output = result[0]
-
-        # Strip prompt from the generated output
         response_only = full_output[len(prompt):].strip()
 
         return {
             "prompt": prompt,
             "response": response_only
         }
-
     except Exception as e:
         return {"error": str(e)}
-
